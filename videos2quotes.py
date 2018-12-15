@@ -19,7 +19,7 @@ else:
 	subtitle = sys.argv[3]
 
 accurate = False # if false: -ss and -to is before -i in the ffmpeg line (much faster). if True they're after -i (*much slower* but might be more accurate sometimes)
-ffmpeg_options = '-map_metadata -1 -map 0:a:0 -map 0:v:0 -c:a aac -c:v libx264 -crf 20 -vf scale=-1:480:lanczos'
+ffmpeg_options = '-map_metadata -1 -map 0:a:0 -map 0:v:0 -c:a aac -c:v libx264 -crf 21'
 
 outputfolder = './' + prefix + '/'
 if not os.path.exists(outputfolder):
