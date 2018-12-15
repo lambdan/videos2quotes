@@ -1,7 +1,7 @@
 # videos2quotes
 extracts quotes from videos based on subtitles
 
-    usage: videos2quotes.py name video.ext subtitle.srt
+    usage: videos2quotes.py video.ext subtitle.srt
 
 ... and then just upload the video (quote) to Twitter or whatever
 
