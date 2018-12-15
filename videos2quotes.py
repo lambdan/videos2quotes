@@ -1,33 +1,39 @@
 import os, sys, re, subprocess
 
-if len(sys.argv) != 4:
-	print "usage: videos2quotes.py name video.ext subtitle.srt"
+accurate = False # if false: -ss and -to is before -i in the ffmpeg line (much faster). if True they're after -i (*much slower* but might be more accurate sometimes)
+ffmpeg_options = '-map_metadata -1 -map 0:a:0 -map 0:v:0 -c:a aac -c:v libx264 -crf 21'
+
+if len(sys.argv) != 3:
+	print "usage: videos2quotes.py video.ext subtitle.srt"
 	sys.exit(1)
 
-prefix = sys.argv[1]
+if not os.path.isfile(sys.argv[1]):
+	print "error: no file: " + sys.argv[1]
+	sys.exit(1)
 
 if not os.path.isfile(sys.argv[2]):
 	print "error: no file: " + sys.argv[2]
 	sys.exit(1)
-else:
+
+# flip around srt and video if necessary
+if sys.argv[1].lower().endswith('.srt'):
+	subtitle = sys.argv[1]
 	video = sys.argv[2]
-
-if not os.path.isfile(sys.argv[3]):
-	print "error: no file: " + sys.argv[3]
-	sys.exit(1)
+elif sys.argv[2].lower().endswith('.srt'):
+	subtitle = sys.argv[2]
+	video = sys.argv[1]
 else:
-	subtitle = sys.argv[3]
-
-accurate = False # if false: -ss and -to is before -i in the ffmpeg line (much faster). if True they're after -i (*much slower* but might be more accurate sometimes)
-ffmpeg_options = '-map_metadata -1 -map 0:a:0 -map 0:v:0 -c:a aac -c:v libx264 -crf 21'
-
-outputfolder = './' + prefix + '/'
-if not os.path.exists(outputfolder):
-	os.makedirs(outputfolder)
+	print "error: none of these are .srt files?"
+	sys.exit(1)
 
 def get_valid_filename(s): # https://stackoverflow.com/a/46801075
     s = str(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
+
+prefix = get_valid_filename(video[:-4]) # strip extension
+outputfolder = './' + prefix + '/'
+if not os.path.exists(outputfolder):
+	os.makedirs(outputfolder)
 
 with open(subtitle) as f:
 	lines = f.read().splitlines()
@@ -38,6 +44,7 @@ for line in lines:
 	if line.isdigit():
 		continue
 	elif line == "":
+
 		fn = prefix + '_' + '%05d' % i + '_' + name + '.mp4'
 		fn = get_valid_filename(fn)
 		outputvid = os.path.abspath(os.path.join(outputfolder, fn))
