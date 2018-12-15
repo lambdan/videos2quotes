@@ -7,3 +7,5 @@ extracts quotes from videos based on subtitles
 
 ## Requires
 - ffmpeg
+
+![Screenshot](https://raw.githubusercontent.com/lambdan/videos2quotes/master/screenshot.png)
