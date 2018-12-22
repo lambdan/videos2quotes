@@ -1,7 +1,9 @@
-import os, sys, re, subprocess
+import os, sys, re, subprocess, datetime
 
 accurate = False # if false: -ss and -to is before -i in the ffmpeg line (much faster). if True they're after -i (*much slower* but might be more accurate sometimes)
-ffmpeg_options = '-map_metadata -1 -map 0:a:0 -map 0:v:0 -c:a aac -c:v libx264 -crf 21'
+ffmpeg_options = '-map_metadata -1 -map 0:a:0 -map 0:v:0 -c:a aac -b:a 256k -c:v libx264 -crf 20'
+start_leniency = 200 # clip will begin n ms earlier
+stop_leniency = 200 # clip will end n ms later
 
 if len(sys.argv) != 3:
 	print "usage: videos2quotes.py video.ext subtitle.srt"
@@ -58,8 +60,12 @@ for line in lines:
 		name = ""
 		i+=1
 	elif "-->" in line:
-		start_time = line.split(" --> ")[0].replace(",", ".")
-		stop_time = line.split(" --> ")[1].replace(",", ".")
+		start_time = datetime.datetime.strptime(line.split(" --> ")[0].replace(",", "."), '%H:%M:%S.%f') - datetime.timedelta(milliseconds=start_leniency)
+		start_time = start_time.strftime('%H:%M:%S.%f')
+
+		stop_time = datetime.datetime.strptime(line.split(" --> ")[1].replace(",", "."), '%H:%M:%S.%f') + datetime.timedelta(milliseconds=stop_leniency)
+		stop_time = stop_time.strftime('%H:%M:%S.%f')
+		
 		inputvid = os.path.abspath(video)
 	else:
 		name = name + " " + line
