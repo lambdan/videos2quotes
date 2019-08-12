@@ -1,20 +1,20 @@
 import os, sys, re, subprocess, datetime
 
 accurate = False # if false: -ss and -to is before -i in the ffmpeg line (much faster). if True they're after -i (*much slower* but might be more accurate sometimes)
-ffmpeg_options = '-map_metadata -1 -map 0:a:0 -map 0:v:0 -c:a aac -b:a 256k -c:v libx264 -crf 20'
+ffmpeg_options = '-map_metadata -1 -map 0:a:0 -map 0:v:0 -c:a aac -c:v libx264 -vf scale=640:360'
 start_leniency = 200 # clip will begin n ms earlier
 stop_leniency = 200 # clip will end n ms later
 
 if len(sys.argv) != 3:
-	print "usage: videos2quotes.py video.ext subtitle.srt"
+	print ("usage: videos2quotes.py video.ext subtitle.srt")
 	sys.exit(1)
 
 if not os.path.isfile(sys.argv[1]):
-	print "error: no file: " + sys.argv[1]
+	print ("error: no file: " + sys.argv[1])
 	sys.exit(1)
 
 if not os.path.isfile(sys.argv[2]):
-	print "error: no file: " + sys.argv[2]
+	print ("error: no file: " + sys.argv[2])
 	sys.exit(1)
 
 # flip around srt and video if necessary
@@ -25,7 +25,7 @@ elif sys.argv[2].lower().endswith('.srt'):
 	subtitle = sys.argv[2]
 	video = sys.argv[1]
 else:
-	print "error: none of these are .srt files?"
+	print ("error: none of these are .srt files?")
 	sys.exit(1)
 
 def get_valid_filename(s): # https://stackoverflow.com/a/46801075
